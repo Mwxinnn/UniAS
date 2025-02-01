@@ -1,0 +1,14 @@
+{
+  "candle": 0,
+  "capsules": 1,
+  "cashew": 2,
+  "chewinggum": 3,
+  "fryum": 4,
+  "macaroni1": 5,
+  "macaroni2": 6,
+  "pcb1": 7,
+  "pcb2": 8,
+  "pcb3": 9,
+  "pcb4": 10,
+  "pipe_fryum": 11
+}

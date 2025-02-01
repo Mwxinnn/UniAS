@@ -1,0 +1,129 @@
+RANDOM_SEED: 133
+PORT: 1111
+TRAINER:
+  MAX_EPOCH: 1000
+  CLIP_MAX_NORM: 0.1
+  VAL_FREQ_EPOCH: 10
+  PRINT_FREQ_STEP: 10
+  TB_FREQ_STEP: 1
+  LR_SCHEDULER:
+    TYPE: StepLR
+    KWARGS:
+      step_size: 400
+      gamma: 0.1
+  OPTIMIZER:
+    TYPE: AdamW
+    KWARGS:
+      lr: 0.0001
+      betas: [ 0.9, 0.999 ]
+      weight_decay: 0.0001
+DATASET:
+  TYPE: anomaly
+  NAME: MVTec
+  CLS_IDX: ./data/MVTec-AD/cls_idx.json
+  IMAGE_READER:
+    TYPE: opencv
+    KWARGS:
+      image_dir: /data/wenxinma/data/mvtec_ad_resized
+      color_mode: RGB
+  TRAIN:
+    META_FILE: ./data/MVTec-AD/train.json
+    HFLIP: ["bottle","carpet","grid","hazel_nut","metal_nut","pill","screw","tile","wood","zipper"]
+    VFLIP: ["bottle","carpet","grid","hazel_nut","metal_nut","pill","screw","tile","wood","zipper"]
+    ROTATE: ["bottle","carpet","hazel_nut","screw","tile","wood"]
+  TEST:
+    META_FILE: ./data/MVTec-AD/test.json
+  INPUT_SIZE: [ 224,224 ] # [H,W]
+  PIXEL_MEAN: [ 0.485, 0.456, 0.406 ]
+  PIXEL_STD: [ 0.229, 0.224, 0.225 ]
+  BATCH_SIZE: 64
+  WORKERS: 4  # number of workers of dataloader for each process
+MODEL:
+  INPUT_SIZE: [ 224,224 ]
+  NUM_CLASS: 15
+  BACKBONE:
+    TRAINABLE: False
+    NAME: "EfficientnetB4"
+    PRETRAINED: True
+    PRETRAINED_WEIGHT_PATH: "/data/wenxinma/.cache/torch/hub/checkpoints/efficientnet-b4-6ed6700e.pth"
+    EFFICIENTNET:
+      LAYERS: [ 1,2,3,4 ]
+      STRIDES: [ 2,4,8,16,32 ]
+      FEATURE_JITTER_SCALE: 20
+      FEATURE_JITTER_PROB: 0.5
+      FEATURE_POOL_SIZE: 3
+  SEM_SEG_HEAD:
+    PIXEL_DECODER_NAME: "TransformerEncoderPixelDecoder"
+    IN_FEATURES: [ "res1", "res2", "res3", "res4" ]
+    NORM: "GN"
+    LOSS_WEIGHT: 1.0
+    CONV_DIM: 256
+    TRANSFORMER_ENC_LAYERS: 3
+    DROPOUT: 0.1
+    ENCODER_MASK: False
+    NHEADS: 4
+    DIM_FEEDFORWARD: 2048
+    PRE_NORM: False
+  MASK_FORMER:
+    ATTN:
+      NAME: "SpaticalNChannelAttn"
+      # NAME: "SpatialAttn"
+      dropout: 0.1
+      pre_norm: False
+      num_heads: 4
+      dim_feedforward: 2048
+      cross_first: True
+    QUERY:
+      PROCESSOR:
+        NAME: "LinCombWeightedQuery"
+        base_ratio: 2
+        hidden_dim: 256
+      FEATURE_PROJECTOR:
+        NAME: "1Conv3x3"
+        hidden_dim: 256
+    ADAPTOR:
+      NAME: "MGG_CNN"
+      hidden_dim: 256
+
+    TRANSFORMER_DECODER_NAME: "MultiScaleMaskedTransformerDecoder"
+    POST_GAUSSIAN: True
+    SIZE_DIVISIBILITY: True
+    HIDDEN_DIM: 256
+    NUM_OBJECT_QUERIES: 196
+    MASK_DIM: 256
+    NEIGHBOR_MASK:
+      NEIGHBOR_SIZE: [ 7,7 ]
+      MASK: [ False,True,True ]
+    OUTPUT_CHANNELS: 3
+  CRITERION:
+    RECON_LOSS:
+      NAME: [ "MSE_loss","CosSim_loss" ]
+      weight: 10
+EVALUATOR:
+  KEY_METRIC: mean_pixel_auc
+  METRICS:
+    AUC:
+      - NAME: std
+        KWARGS:
+          top_percent: 1
+      - NAME: max
+        KWARGS:
+          avgpool_size: [ 1, 1 ]
+          top_percent: 1
+      - NAME: pixel
+      - NAME: ap
+      - NAME: dice
+  VIS_COMPOUND:
+    SAVE_DIR: vis_compound
+    MAX_SCORE: null
+    MIN_SCORE: null
+  VIS_SINGLE:
+    SAVE_DIR: vis_single
+    MAX_SCORE: null
+    MIN_SCORE: null
+SAVER:
+  AUTO_RESUME: True
+  ALWAYS_SAVE: False
+  EXP_NAME: Baseline_bs1channel10
+  LOG_DIR: log/
+  RESUME_MODEL:

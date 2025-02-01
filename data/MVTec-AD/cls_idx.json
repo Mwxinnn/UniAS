@@ -1,0 +1,17 @@
+{
+  "bottle": 0,
+  "cable": 1,
+  "capsule": 2,
+  "carpet": 3,
+  "grid": 4,
+  "hazelnut": 5,
+  "leather": 6,
+  "metal_nut": 7,
+  "pill": 8,
+  "screw": 9,
+  "tile": 10,
+  "toothbrush": 11,
+  "transistor": 12,
+  "wood": 13,
+  "zipper": 14
+}
