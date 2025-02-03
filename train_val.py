@@ -30,7 +30,6 @@ from utils.misc_helper import (
 from utils.training_utils import get_optimizer, get_scheduler, setup_distributed
 from utils.vis_helper import visualize_compound, visualize_single
 
-import pdb
 
 # 忽略所有警告
 warnings.filterwarnings("ignore")
