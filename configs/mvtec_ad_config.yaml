@@ -24,7 +24,7 @@ DATASET:
   IMAGE_READER:
     TYPE: opencv
     KWARGS:
-      image_dir: /data/wenxinma/data/mvtec_ad_resized
+      image_dir: ~/data/mvtec_ad_resized
       color_mode: RGB
   TRAIN:
     META_FILE: ./data/MVTec-AD/train.json
@@ -45,7 +45,7 @@ MODEL:
     TRAINABLE: False
     NAME: "EfficientnetB4"
     PRETRAINED: True
-    PRETRAINED_WEIGHT_PATH: "/data/wenxinma/.cache/torch/hub/checkpoints/efficientnet-b4-6ed6700e.pth"
+    PRETRAINED_WEIGHT_PATH: "~/.cache/torch/hub/checkpoints/efficientnet-b4-6ed6700e.pth"
     EFFICIENTNET:
       LAYERS: [ 1,2,3,4 ]
       STRIDES: [ 2,4,8,16,32 ]
@@ -66,7 +66,7 @@ MODEL:
     PRE_NORM: False
   MASK_FORMER:
     ATTN:
-      NAME: "SpaticalNChannelAttn"
+      NAME: "SpaticalNChannelAttn"  # Optional, basic Transformer: "SpatialAttn"
       # NAME: "SpatialAttn"
       dropout: 0.1
       pre_norm: False
@@ -86,7 +86,7 @@ MODEL:
       hidden_dim: 256
 
     TRANSFORMER_DECODER_NAME: "MultiScaleMaskedTransformerDecoder"
-    POST_GAUSSIAN: True
+    POST_GAUSSIAN: True # optional, multi-level post-process
     SIZE_DIVISIBILITY: True
     HIDDEN_DIM: 256
     NUM_OBJECT_QUERIES: 196
@@ -126,4 +126,3 @@ SAVER:
   ALWAYS_SAVE: False
   EXP_NAME: Baseline_bs1channel10
   LOG_DIR: log/
-  RESUME_MODEL:
