@@ -4,6 +4,12 @@ This is the official PyTorch implementation of \[WACV2025 oral paper\] [**Toward
 ## Abstract
 Unsupervised anomaly detection (UAD) from images strives to model normal data distributions, creating discriminative representations to distinguish and precisely localize anomalies. Despite recent advancements in the efficient and unified one-for-all scheme, challenges persist in accurately segmenting anomalies for further monitoring. Moreover, this problem is obscured by the widely-used AUROC metric under imbalanced UAD settings. This motivates us to emphasize the significance of precise segmentation of anomaly pixels using pAP and DSC as metrics. To address the unsolved segmentation task, we introduce the Unified Anomaly Segmentation (UniAS). UniAS presents a multi-level hybrid pipeline that progressively enhances normal information from coarse to fine, incorporating a novel multi-granularity gated CNN (MGG-CNN) into Transformer layers to explicitly aggregate local details from different granularities. UniAS achieves state-of-the-art anomaly segmentation performance, attaining 65.12/59.33 and 40.06/32.50 in pAP/DSC on the MVTec- AD and VisA datasets, respectively, surpassing previous methods significantly.
 
+### Discussion about AUROC
+Although AUROC has been widely used in current works, we have discovered a serious problem of AUROC under data-imbalanced situation which would lead to inflated AUORC score. However, anomaly segmentation task tends to be under data-imbalanced situation since anomalous regions often appear rarely with a few pixels.
+![](pics/AUROC.png)
+
+We argue that, AUROC can effectively reflect false negative predictions \(since it can prevent all-negative predictions\), but it is not a suitable metric to reflect false positive predictions.
+
 ### Overview
 ![](pics/main.png)
 
@@ -46,7 +52,7 @@ Change the ```DATASET.IMAGE_READER.KWARGS``` in the configuration files in ```co
 For evaluation, add the path of weights in ```SAVER.RESUME_MODEL``` in ```configs```.
 
 ## Results
-Although not mentioned, we report the average results of three runs with different random seeds in our main paper. The implementation results of current random seed 133 is:
+The implementation results of current code is:
 
 |Dataset|pixel-AUC|pixel-AP|Dice|(image-AUC)|
 |---|---|---|---|---|
