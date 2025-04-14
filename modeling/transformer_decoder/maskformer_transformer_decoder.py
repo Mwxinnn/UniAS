@@ -311,7 +311,7 @@ class MultiScaleMaskedTransformerDecoder(nn.Module):
         if "MSE_loss" in self.loss_cfg.RECON_LOSS.get("NAME", None):
             recon_loss = recon_loss + nn.functional.mse_loss(out, feature)
         if "CosSim_loss" in self.loss_cfg.RECON_LOSS.get("NAME", None):
-            recon_loss = recon_loss + (1 - anomaly_map).mean()
+            recon_loss = recon_loss + anomaly_map.mean()
 
         if anomaly_map.shape[-2:] != target_size:
             anomaly_map = nn.functional.interpolate(
